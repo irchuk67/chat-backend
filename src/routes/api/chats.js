@@ -3,7 +3,7 @@ const chatService = require('../../service/chatService');
 
 router.get('/', (req, res) => {
     console.log('Received request to get all chats');
-    chatService.getAllChats()
+    chatService.getAllChatsForUser(req.userId)
         .then(chats => {res.json(chats)})
         .catch(err => {
             console.error(err);
@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     console.log('Received request to create new chat');
-    chatService.createChat(req.body)
+    chatService.createChat(req.body, req.userId)
         .then(chatId => {res.status(201).json({id: chatId})})
         .catch(err => {
             console.error(err);

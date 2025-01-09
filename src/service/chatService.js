@@ -1,23 +1,29 @@
 const Chat = require('../model/Chat');
 const messageService = require('../service/messageService');
+const userService = require('./userService')
 
-async function createChat(chat) {
+async function createChat(chat, userGoogleId) {
+    const user = await userService.findUserByGoogleId(userGoogleId);
     let newChat = new Chat({
         firstName: chat.firstName,
         lastName: chat.lastName,
+        userId: user._id
     })
     let createdChat = await newChat.save();
     return createdChat._id;
 }
 
-async function getAllChats() {
-    let chats = await Chat.find({});
+async function getAllChatsForUser(userGoogleId) {
+    const user = await userService.findUserByGoogleId(userGoogleId);
+
+    let chats = await Chat.find({userId: user._id});
     chats = await Promise.all(chats.map(async chat => {
         let latestMessage = await messageService.getLatestChatMessage(chat._id);
         let mapped = {
             id: chat._id,
             firstName: chat.firstName,
             lastName: chat.lastName,
+            userId: chat.userId,
         };
         if (latestMessage) {
             mapped.latestMessage = {
@@ -65,7 +71,7 @@ function deleteChat(id) {
 
 module.exports = {
     createChat,
-    getAllChats,
+    getAllChatsForUser,
     updateChat,
     deleteChat,
     getChatById,
