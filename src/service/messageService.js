@@ -20,8 +20,30 @@ function createNewMessage(message) {
     return newMessage.save();
 }
 
+function deleteMessage(id) {
+    return Message.findByIdAndDelete(id)
+}
+
+function updateMessage(id, message) {
+    return Message.findById(id)
+        .then(foundMessage => {
+            if(!foundMessage) {
+                return null;
+            }
+            foundMessage.content = message.content;
+            return foundMessage.save();
+        })
+}
+
+function getAllChatMessages(chatId) {
+    return Message.find({ chatId: chatId })
+}
+
 module.exports = {
     getLatestChatMessage,
     createNewMessage,
-    MessageType
+    MessageType,
+    getAllChatMessages,
+    deleteMessage,
+    updateMessage
 };
