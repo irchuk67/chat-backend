@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const chatService = require('../../service/chatService');
+const userService = require('../../service/userService')
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     console.log('Received request to get all chats');
-    chatService.getAllChatsForUser(req.userId)
+    let user = await userService.findUserByGoogleId(req.userId);
+    chatService.getAllChatsForUser(user)
         .then(chats => {res.json(chats)})
         .catch(err => {
             console.error(err);
@@ -11,9 +13,11 @@ router.get('/', (req, res) => {
         })
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     console.log('Received request to create new chat');
-    chatService.createChat(req.body, req.userId)
+
+    let user = await userService.findUserByGoogleId(req.userId);
+    chatService.createChat(req.body, user)
         .then(chatId => {res.status(201).json({id: chatId})})
         .catch(err => {
             console.error(err);

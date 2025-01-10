@@ -1,9 +1,7 @@
 const Chat = require('../model/Chat');
-const messageService = require('../service/messageService');
-const userService = require('./userService')
+const messageService = require('./messageService');
 
-async function createChat(chat, userGoogleId) {
-    const user = await userService.findUserByGoogleId(userGoogleId);
+async function createChat(chat, user) {
     let newChat = new Chat({
         firstName: chat.firstName,
         lastName: chat.lastName,
@@ -13,9 +11,11 @@ async function createChat(chat, userGoogleId) {
     return createdChat._id;
 }
 
-async function getAllChatsForUser(userGoogleId) {
-    const user = await userService.findUserByGoogleId(userGoogleId);
+function findChatsForUser(userId) {
+    return Chat.find({userId: userId});
+}
 
+async function getAllChatsForUser(user) {
     let chats = await Chat.find({userId: user._id});
     chats = await Promise.all(chats.map(async chat => {
         let latestMessage = await messageService.getLatestChatMessage(chat._id);
@@ -65,7 +65,18 @@ function deleteChat(id) {
             if(!chat) {
                 return null;
             }
+            messageService.deleteChatMessages(id);
             return Chat.deleteOne(chat);
+        });
+}
+
+function createChatWithMessages(chatWithMessages, user) {
+    return createChat(chatWithMessages, user)
+        .then(chatId => {
+            chatWithMessages.messages.forEach(message => {
+                message.chatId = chatId.toString()
+                messageService.createNewMessage(message)
+            })
         });
 }
 
@@ -75,4 +86,6 @@ module.exports = {
     updateChat,
     deleteChat,
     getChatById,
+    findChatsForUser,
+    createChatWithMessages
 }

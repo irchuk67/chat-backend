@@ -3,7 +3,7 @@ const userService = require('../../service/userService');
 
 router.post('/', (req, res) => {
     console.log('Received request to check or save user');
-    userService.saveOrCheckUser(req.userId)
+    userService.saveOrCheckUser(req.userId, req.body.sessionId)
         .then(user => {
             res.status(200).end();
         }).catch(err => {

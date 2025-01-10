@@ -1,8 +1,13 @@
+const mongoose = require('mongoose');
 const Message = require('../model/Message');
 
 const MessageType = {
     SEND : 'SEND',
     RECEIVED : 'RECEIVED'
+}
+
+function getAllChatMessages(chatId) {
+    return Message.find({ chatId: chatId })
 }
 
 function getLatestChatMessage(chatId) {
@@ -14,7 +19,7 @@ function createNewMessage(message) {
         content: message.content,
         chatId: new mongoose.Types.ObjectId(message.chatId),
         messageType: message.messageType,
-        date: new Date()
+        date: message.date ? message.date : new Date()
     });
 
     return newMessage.save();
@@ -22,6 +27,10 @@ function createNewMessage(message) {
 
 function deleteMessage(id) {
     return Message.findByIdAndDelete(id)
+}
+
+function deleteChatMessages(chatId) {
+    return Message.deleteMany({ chatId: chatId })
 }
 
 function updateMessage(id, message) {
@@ -35,15 +44,12 @@ function updateMessage(id, message) {
         })
 }
 
-function getAllChatMessages(chatId) {
-    return Message.find({ chatId: chatId })
-}
-
 module.exports = {
-    getLatestChatMessage,
-    createNewMessage,
-    MessageType,
     getAllChatMessages,
+    createNewMessage,
     deleteMessage,
-    updateMessage
+    deleteChatMessages,
+    getLatestChatMessage,
+    updateMessage,
+    MessageType
 };
