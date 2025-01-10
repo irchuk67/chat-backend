@@ -2,10 +2,10 @@ const express = require('express');
 const cors = require("cors");
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const uuid = require('uuid')
 const dotenv = require('dotenv');
 const { WebSocketServer } = require('ws');
 const websocketHandlerService = require('./service/websocketHandlerService');
-
 
 dotenv.config();
 const app = express();
@@ -17,6 +17,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+app.use(require('./routes'));
 const server = app.listen(PORT, (error) => {
     if(!error) {
         console.log(`Server is running on port ${PORT}`)
@@ -24,24 +25,30 @@ const server = app.listen(PORT, (error) => {
         console.log("Error: ", error)
     }
 })
-const wss = new WebSocketServer({ server, path: '/chat' })
+
+const wss = new WebSocketServer({ server, path: '/chat' });
 
 wss.on('connection', (ws) => {
     console.log('WebSocket connection established');
-    ws.send('OK');
+    let session = uuid.v4().toString();
+    websocketHandlerService.sessions.set(session, ws);
+    ws.send(session);
 
     ws.on('error', err => {
         console.log("Error during WS connection :", session)
-        console.error(err)
+        console.error(err);
+        websocketHandlerService.sessions.delete(session);
     });
 
     ws.on('close', (code, reason) => {
-        console.log(`Closing WS connection with id ${session}. Code: ${code}, Reason: ${reason} `)
+        console.log(`Closing WS connection with id ${session}. Code: ${code}, Reason: ${reason} `);
+        websocketHandlerService.sessions.delete(session);
     });
 
     ws.on('message', function message(message) {
         websocketHandlerService.receiveMessage(message, ws);
     })
-})
+});
+
 
 module.exports = app;

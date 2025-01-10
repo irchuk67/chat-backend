@@ -17,7 +17,24 @@ function saveOrCheckUser(googleId) {
         })
 }
 
+function manageRandomMessages(googleId, sendRandomMessages) {
+    return User.findOne({googleId: googleId})
+        .then(user => {
+            if (!user) {
+                return null;
+            }
+            user.sendRandomMessages = sendRandomMessages;
+            return user.save();
+        })
+}
+
+function findUsersWithEnabledRandomMessages() {
+    return User.find({sendRandomMessages: true})
+}
+
 module.exports = {
     saveOrCheckUser,
-    findUserByGoogleId
+    findUserByGoogleId,
+    manageRandomMessages,
+    findUsersWithEnabledRandomMessages
 }
