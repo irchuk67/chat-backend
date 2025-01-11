@@ -15,8 +15,19 @@ function findChatsForUser(userId) {
     return Chat.find({userId: userId});
 }
 
-async function getAllChatsForUser(user) {
-    let chats = await Chat.find({userId: user._id});
+async function getAllChatsForUser(user, search) {
+    const regex = new RegExp(search, 'i');
+    let chats = await Chat.find({
+        $and: [
+            { userId: user._id },
+            {
+                $or: [
+                    { firstName: regex },
+                    { lastName: regex }
+                ]
+            }
+        ]
+    });
     chats = await Promise.all(chats.map(async chat => {
         let latestMessage = await messageService.getLatestChatMessage(chat._id);
         let mapped = {

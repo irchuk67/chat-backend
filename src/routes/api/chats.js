@@ -5,7 +5,7 @@ const userService = require('../../service/userService')
 router.get('/', async (req, res) => {
     console.log('Received request to get all chats');
     let user = await userService.findUserByGoogleId(req.userId);
-    chatService.getAllChatsForUser(user)
+    chatService.getAllChatsForUser(user, req.query.search)
         .then(chats => {res.json(chats)})
         .catch(err => {
             console.error(err);
