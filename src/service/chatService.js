@@ -38,7 +38,15 @@ async function getAllChatsForUser(user) {
     if (!chats || chats.length === 0) {
         return [];
     }
-    chats.sort((a, b) => new Date(b.date) - new Date(a.date));
+    chats.sort((a, b) => {
+        if (!a.latestMessage) {
+            return -1;
+        }
+        if (!b.latestMessage) {
+            return 1;
+        }
+        return new Date(b.latestMessage.date) - new Date(a.latestMessage.date)
+    });
     return chats;
 }
 
@@ -62,7 +70,7 @@ function updateChat(id, chat) {
 function deleteChat(id) {
     return Chat.findById(id)
         .then(chat => {
-            if(!chat) {
+            if (!chat) {
                 return null;
             }
             messageService.deleteChatMessages(id);
