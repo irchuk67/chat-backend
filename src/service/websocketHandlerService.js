@@ -8,7 +8,7 @@ const sessions = new Map()
 
 function receiveMessage(receivedMessage, ws) {
     let newMessage = JSON.parse(receivedMessage);
-    newMessage.messageType = messageService.MessageType.SEND;
+    newMessage.messageType = messageService.MessageType.SENT;
     messageService.createNewMessage(newMessage)
         .then(message => {
             setTimeout(async () => await generateAndSendMessage(message.chatId, ws), 3000);
