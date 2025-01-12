@@ -1,0 +1,11 @@
+runtime: nodejs20
+env: standard
+health_check:
+  enable_health_check: true
+env_variables:
+  PORT: 8080
+  MONGO_DB_URL: mongodb+srv://new_user:YPPTfrlKOZ8Vvpfw@cluster0.b3sev.mongodb.net/?retryWrites=true&w=majority
+  GOOGLE_CLIENT_ID: 811479879975-77634rmv1grsr1l1125jf3jvqlb26pqi.apps.googleusercontent.com
+handlers:
+  - url: /.*
+    script: auto

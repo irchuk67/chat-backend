@@ -9,7 +9,7 @@ const websocketHandlerService = require('./service/websocketHandlerService');
 
 dotenv.config();
 const app = express();
-mongoose.connect('mongodb+srv://new_user:YPPTfrlKOZ8Vvpfw@cluster0.b3sev.mongodb.net/?retryWrites=true&w=majority'/*process.env.MONGODB_URI_USERS || 'mongodb://users:users@localhost:27019/users'*/);
+mongoose.connect(process.env.MONGO_DB_URL);
 const PORT = process.env.PORT || 8080;
 
 app.use(cors({
@@ -26,6 +26,9 @@ const server = app.listen(PORT, (error) => {
         console.log("Error: ", error)
     }
 })
+app.get('/_ah/health', (req, res) => {
+    res.status(200).send('OK');
+});
 
 const wss = new WebSocketServer({ server, path: '/chat' });
 
