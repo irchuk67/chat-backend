@@ -5,7 +5,7 @@ router.post('/', (req, res) => {
     console.log('Received request to check or save user');
     userService.saveOrCheckUser(req.userId, req.body.sessionId)
         .then(user => {
-            res.status(200).end();
+            res.status(200).json(user);
         }).catch(err => {
         console.error(err);
         res.status(500).json({error: err.message});
