@@ -14,7 +14,10 @@ function receiveMessage(receivedMessage, ws) {
         newMessage.isRead = true;
         messageService.createNewMessage(newMessage)
             .then(message => {
-                setTimeout(async () => await generateAndSendMessage(message.chatId, ws), 3000);
+                setTimeout(async () => {
+                    let chat = await chatService.getChatById(newMessage.chatId.toString());
+                    await generateAndSendMessage(chat, ws)
+                }, 3000);
             })
             .catch(err => {
                 console.error(err);
@@ -27,16 +30,20 @@ function receiveMessage(receivedMessage, ws) {
 
 }
 
-async function generateAndSendMessage(chatId, ws) {
+async function generateAndSendMessage(chat, ws) {
     let advice = await adviceClient.getAdvice();
     let generatedMessage = await messageService.createNewMessage({
-        chatId: chatId,
+        chatId: chat._id,
+        firstName: chat.firstName,
+        lastName: chat.lastName,
         content: advice.slip.advice,
         messageType: messageService.MessageType.RECEIVED,
         isRead: false
     });
     let messageToSend = {
         chatId: generatedMessage.chatId,
+        firstName: chat.firstName,
+        lastName: chat.lastName,
         content: generatedMessage.content,
         messageType: generatedMessage.messageType,
         date: generatedMessage.date,
@@ -63,7 +70,7 @@ cron.schedule('*/10 * * * * *', async () => {
         let index = Math.floor(Math.random() * chats.length);
         let ws = sessions.get(user.sessionId);
         if(ws){
-            generateAndSendMessage(chats[index]._id, ws);
+            generateAndSendMessage(chats[index], ws);
         }
     })
 });

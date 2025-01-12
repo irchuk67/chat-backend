@@ -64,7 +64,7 @@ async function getAllChatsForUser(user, search) {
 }
 
 function getChatById(id) {
-    return Chat.findById({id: id});
+    return Chat.findById({_id: id});
 }
 
 function updateChat(id, chat) {
