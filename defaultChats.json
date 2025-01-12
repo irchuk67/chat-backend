@@ -6,17 +6,20 @@
       {
         "content": "Hi,how are you?",
         "messageType": "RECEIVED",
-        "date": "2022-08-17T07:43:00"
+        "date": "2022-08-17T07:43:00",
+        "isRead" : true
       },
       {
         "content": "Not bad. What about you?",
         "messageType": "SENT",
-        "date": "2022-08-17T07:45:00"
+        "date": "2022-08-17T07:45:00",
+        "isRead" : true
       },
       {
         "content": "How was your meeting?",
         "messageType": "SENT",
-        "date": "2022-08-17T07:48:00"
+        "date": "2022-08-17T07:48:00",
+        "isRead" : true
       }
     ]
   },
@@ -26,12 +29,14 @@
       {
         "content": "Hello! Are you at home?",
         "messageType": "SENT",
-        "date": "2022-08-16T09:43:00"
+        "date": "2022-08-16T09:43:00",
+        "isRead" : true
       },
       {
         "content": "Hi! No, I am going for a walk.",
         "messageType": "RECEIVED",
-        "date": "2022-08-16T09:45:00"
+        "date": "2022-08-16T09:45:00",
+        "isRead" : true
       }
     ]
   },
@@ -41,12 +46,9 @@
       {
         "content": "Hi! I am a little sad, tell me a joke, please.",
         "messageType": "RECEIVED",
-        "date": "2022-08-14T17:43:00"
+        "date": "2022-08-14T17:43:00",
+        "isRead" : true
       }
     ]
-  },
-  {
-    "firstName": "Piter",
-    "messages": []
   }
 ]

@@ -1,6 +1,6 @@
 const User = require('../model/User');
 const chatService = require('./chatService')
-const fs = require('fs');
+const defaultChats = require('../../defaultChats.json')
 
 function findUserByGoogleId(googleId) {
     return User.findOne({googleId: googleId});
@@ -8,26 +8,20 @@ function findUserByGoogleId(googleId) {
 
 function saveOrCheckUser(googleId, sessionId) {
     return User.findOne({googleId: googleId})
-        .then(user => {
+        .then(async user => {
             if(user) {
                 user.sessionId = sessionId;
-                return user.save();
+                return await user.save();
             }
             let newUser = new User({
                 googleId: googleId,
                 sessionId: sessionId
             })
-            return newUser.save()
-                .then(user => {
-                    fs.readFile('defaultChats.json', 'utf8', function (err, data) {
-                        if (err) throw err;
-                        let defaultChats = JSON.parse(data);
-                        defaultChats.forEach(chatWithMessages => {
-                            chatService.createChatWithMessages(chatWithMessages, user);
-                        })
-                    });
-                    return user;
-                });
+            let savedUser = await newUser.save();
+            await Promise.allSettled(defaultChats.map(async chatWithMessages => {
+                return await chatService.createChatWithMessages(chatWithMessages, savedUser);
+            }))
+            return savedUser;
         })
 }
 

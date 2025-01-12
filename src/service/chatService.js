@@ -91,14 +91,13 @@ function deleteChat(id) {
         });
 }
 
-function createChatWithMessages(chatWithMessages, user) {
-    return createChat(chatWithMessages, user)
-        .then(chatId => {
-            chatWithMessages.messages.forEach(message => {
-                message.chatId = chatId.toString()
-                messageService.createNewMessage(message)
-            })
-        });
+async function createChatWithMessages(chatWithMessages, user) {
+    let chatId = await createChat(chatWithMessages, user)
+    await chatWithMessages.messages.map(async message => {
+        message.chatId = chatId.toString()
+        await messageService.createNewMessage(message)
+    })
+    return chatId
 }
 
 module.exports = {
