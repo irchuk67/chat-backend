@@ -62,7 +62,9 @@ cron.schedule('*/10 * * * * *', async () => {
         }
         let index = Math.floor(Math.random() * chats.length);
         let ws = sessions.get(user.sessionId);
-        generateAndSendMessage(chats[index]._id, ws);
+        if(ws){
+            generateAndSendMessage(chats[index]._id, ws);
+        }
     })
 });
 

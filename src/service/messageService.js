@@ -36,7 +36,8 @@ function createNewMessage(message) {
         content: message.content,
         chatId: new mongoose.Types.ObjectId(message.chatId),
         messageType: message.messageType,
-        date: message.date ? message.date : new Date()
+        date: message.date ? message.date : new Date(),
+        isRead: message.isRead,
     });
 
     return newMessage.save();
