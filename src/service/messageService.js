@@ -24,16 +24,11 @@ function countUnreadMessagesForChat(chatId) {
 }
 
 function markMessagesRead(messagesIds) {
-    return Message.updateMany(
-        {
-            $and: [
-                {_id: {$in: messagesIds}},
-                {isRead: false}
-            ]
-        },
-
-        {isRead: true}
-    )
+    return Message.find({_id: {$in: messagesIds}})
+        .then(messages => messages.forEach(message => {
+            message.isRead = true;
+            return message.save();
+        }))
 }
 
 function createNewMessage(message) {
