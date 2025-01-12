@@ -7,16 +7,24 @@ const cron = require('node-cron')
 const sessions = new Map()
 
 function receiveMessage(receivedMessage, ws) {
-    let newMessage = JSON.parse(receivedMessage);
-    newMessage.messageType = messageService.MessageType.SENT;
-    messageService.createNewMessage(newMessage)
-        .then(message => {
-            setTimeout(async () => await generateAndSendMessage(message.chatId, ws), 3000);
-        })
-        .catch(err => {
-            console.error(err);
-            ws.send(err.message);
-        });
+    let parsed = JSON.parse(receivedMessage);
+    if(parsed.type === 'NEW_MESSAGE') {
+        let newMessage = parsed.message;
+        newMessage.messageType = messageService.MessageType.SENT;
+        newMessage.isRead = true;
+        messageService.createNewMessage(newMessage)
+            .then(message => {
+                setTimeout(async () => await generateAndSendMessage(message.chatId, ws), 3000);
+            })
+            .catch(err => {
+                console.error(err);
+                ws.send(err.message);
+            });
+    } else if (parsed.type === 'SET_AS_READ') {
+        let readMessages = parsed.messages;
+        messageService.markMessagesRead(readMessages);
+    }
+
 }
 
 async function generateAndSendMessage(chatId, ws) {
@@ -24,13 +32,15 @@ async function generateAndSendMessage(chatId, ws) {
     let generatedMessage = await messageService.createNewMessage({
         chatId: chatId,
         content: advice.slip.advice,
-        messageType: messageService.MessageType.RECEIVED
+        messageType: messageService.MessageType.RECEIVED,
+        isRead: false
     });
     let messageToSend = {
         chatId: generatedMessage.chatId,
         content: generatedMessage.content,
         messageType: generatedMessage.messageType,
-        date: generatedMessage.date
+        date: generatedMessage.date,
+        isRead: false
     }
     ws.send(JSON.stringify(messageToSend));
 }

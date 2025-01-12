@@ -2,16 +2,38 @@ const mongoose = require('mongoose');
 const Message = require('../model/Message');
 
 const MessageType = {
-    SENT : 'SENT',
-    RECEIVED : 'RECEIVED'
+    SENT: 'SENT',
+    RECEIVED: 'RECEIVED'
 }
 
 function getAllChatMessages(chatId) {
-    return Message.find({ chatId: chatId })
+    return Message.find({chatId: chatId})
 }
 
 function getLatestChatMessage(chatId) {
-    return Message.findOne({ chatId: chatId }).sort({ date: -1 })
+    return Message.findOne({chatId: chatId}).sort({date: -1})
+}
+
+function countUnreadMessagesForChat(chatId) {
+    return Message.countDocuments({
+        $and: [
+            {chatId: chatId},
+            {isRead: false}
+        ]
+    })
+}
+
+function markMessagesRead(messagesIds) {
+    return Message.updateMany(
+        {
+            $and: [
+                {_id: {$in: messagesIds}},
+                {isRead: false}
+            ]
+        },
+
+        {isRead: true}
+    )
 }
 
 function createNewMessage(message) {
@@ -30,13 +52,13 @@ function deleteMessage(id) {
 }
 
 function deleteChatMessages(chatId) {
-    return Message.deleteMany({ chatId: chatId })
+    return Message.deleteMany({chatId: chatId})
 }
 
 function updateMessage(id, message) {
     return Message.findById(id)
         .then(foundMessage => {
-            if(!foundMessage) {
+            if (!foundMessage) {
                 return null;
             }
             foundMessage.content = message.content;
@@ -51,5 +73,7 @@ module.exports = {
     deleteChatMessages,
     getLatestChatMessage,
     updateMessage,
-    MessageType
+    MessageType,
+    countUnreadMessagesForChat,
+    markMessagesRead
 };

@@ -29,13 +29,15 @@ async function getAllChatsForUser(user, search) {
         ]
     });
     chats = await Promise.all(chats.map(async chat => {
-        let latestMessage = await messageService.getLatestChatMessage(chat._id);
+        let unreadMessagesCount = await messageService.countUnreadMessagesForChat(chat._id);
         let mapped = {
             id: chat._id,
             firstName: chat.firstName,
             lastName: chat.lastName,
             userId: chat.userId,
+            unreadMessagesCount: unreadMessagesCount
         };
+        let latestMessage = await messageService.getLatestChatMessage(chat._id);
         if (latestMessage) {
             mapped.latestMessage = {
                 id: latestMessage._id,
